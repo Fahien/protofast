@@ -3,9 +3,11 @@ package me.fahien.protofast.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Logger;
 
 import me.fahien.protofast.screen.ProtoFastScreen;
+import me.fahien.protofast.screen.ScreenEnumerator;
 
 /**
  * Proto Fast {@link Game}
@@ -13,10 +15,13 @@ import me.fahien.protofast.screen.ProtoFastScreen;
  * @author Fahien
  */
 public class ProtoFastGame extends Game {
+	private static final String logo = "Powered by\n" +
+			"╔═╗┬─┐┌─┐┌┬┐┌─┐╔═╗┌─┐┌─┐┌┬┐\n" +
+			"╠═╝├┬┘│ │ │ │ │╠╣ ├─┤└─┐ │ \n" +
+			"╩  ┴└─└─┘ ┴ └─┘╚  ┴ ┴└─┘ ┴ ";
+
 	private static final int LOGGER_LEVEL = Logger.DEBUG;
-	/**
-	 * This is the {@link Logger} which will be used throughout the whole testing
-	 */
+
 	public static final Logger logger = new Logger(ProtoFastGame.class.getSimpleName(), LOGGER_LEVEL);
 
 	private AssetManager assetManager;
@@ -43,6 +48,8 @@ public class ProtoFastGame extends Game {
 	@Override
 	public void create() {
 		Gdx.app.setLogLevel(LOGGER_LEVEL);
+		logger.info(logo);
+		setScreen(ScreenEnumerator.MAIN.getScreen());
 		logger.debug("Game initialized");
 	}
 

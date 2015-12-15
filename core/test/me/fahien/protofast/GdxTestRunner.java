@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.utils.Logger;
 
 import org.junit.runner.notification.RunNotifier;
@@ -40,6 +41,7 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 
 		Gdx.gl = mock(GL20.class);
 		Gdx.gl20 = mock(GL20.class);
+		Gdx.gl30 = mock(GL30.class);
 
 		logger.setLevel(Logger.INFO);
 		app.setLogLevel(Application.LOG_INFO);

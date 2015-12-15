@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -64,7 +65,11 @@ public class ProtoFastGameTest {
 	public void couldInjectDependenciesInScreens() {
 		for (ScreenEnumerator screenEnum : ScreenEnumerator.values()) {
 			ProtoFastScreen screen = screenEnum.getScreen();
-			game.setScreen(screen);
+			try {
+				game.setScreen(screen);
+			} catch (GdxRuntimeException e) {
+				// Ignore
+			}
 			Assert.assertTrue(screen.isInitialized());
 			Assert.assertEquals("The screens are not equals", screen, game.getScreen());
 		}
@@ -78,6 +83,12 @@ public class ProtoFastGameTest {
 		InfoScreen infoScreen = (InfoScreen) ScreenEnumerator.INFO.getScreen();
 		game.setScreen(infoScreen);
 		Assert.assertFalse("The screen is not disposed properly", mainScreen.isInitialized());
+	}
+
+	@Test
+	public void shouldShowTheMainScreenAfterCreate() {
+		game.create();
+		Assert.assertEquals("The game is not showing the main screen", ScreenEnumerator.MAIN.getScreen(), game.getScreen());
 	}
 
 	@After
