@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
  * @author Fahien
  */
 public class ProtoFastScreen implements Screen {
-	public static final float WIDTH = 960f;
-	public static final float HEIGHT = 540f;
 
 	private boolean initialized;
 	private AssetManager assetManager;

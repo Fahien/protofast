@@ -5,5 +5,4 @@ package me.fahien.protofast.screen;
  *
  * @author Fahien
  */
-public class InfoScreen extends ProtoFastScreen {
-}
+public class InfoScreen extends ProtoFastScreen {}

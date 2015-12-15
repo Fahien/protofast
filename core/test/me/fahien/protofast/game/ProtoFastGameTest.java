@@ -4,19 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import me.fahien.protofast.GdxTestRunner;
-import me.fahien.protofast.screen.InfoScreen;
-import me.fahien.protofast.screen.MainScreen;
 import me.fahien.protofast.screen.ProtoFastScreen;
 import me.fahien.protofast.screen.ScreenEnumerator;
+
+import static me.fahien.protofast.GdxTestRunner.logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * {@link ProtoFastGame} Test Case
@@ -27,6 +31,8 @@ import me.fahien.protofast.screen.ScreenEnumerator;
 public class ProtoFastGameTest {
 	private static final String TEST_DIR = "test/";
 	private static final String TEST_ASSET = TEST_DIR + "badlogic.jpg";
+	private static final String MODELS_DIR = "models/";
+	private static final String CAR_MODEL = MODELS_DIR + "car.g3db";
 
 	private ProtoFastGame game;
 
@@ -37,7 +43,7 @@ public class ProtoFastGameTest {
 
 	@Test
 	public void coudlGetTheAssetManager() {
-		Assert.assertNotNull("The game has no asset manager", game.getAssetManager());
+		assertNotNull("The game has no asset manager", game.getAssetManager());
 	}
 
 	@Test
@@ -45,7 +51,7 @@ public class ProtoFastGameTest {
 		AssetManager assetManager = game.getAssetManager();
 		assetManager.load(TEST_ASSET, Texture.class);
 		assetManager.finishLoading();
-		Assert.assertNotNull("Could not get test asset: " + TEST_ASSET, assetManager.get(TEST_ASSET));
+		assertNotNull("Could not get test asset: " + TEST_ASSET, assetManager.get(TEST_ASSET));
 	}
 
 	@Test
@@ -57,38 +63,60 @@ public class ProtoFastGameTest {
 		}
 		assetManager.finishLoading();
 		for(FileHandle file : files) {
-			Assert.assertNotNull("Could not get an asset: " + file.path(), assetManager.get(file.path(), Texture.class));
+			assertNotNull("Could not get an asset: " + file.path(), assetManager.get(file.path(), Texture.class));
 		}
 	}
 
 	@Test
 	public void couldInjectDependenciesInScreens() {
 		for (ScreenEnumerator screenEnum : ScreenEnumerator.values()) {
-			ProtoFastScreen screen = screenEnum.getScreen();
 			try {
-				game.setScreen(screen);
+				game.setScreen(screenEnum);
 			} catch (GdxRuntimeException e) {
-				// Ignore
+				logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
 			}
-			Assert.assertTrue(screen.isInitialized());
-			Assert.assertEquals("The screens are not equals", screen, game.getScreen());
+			ProtoFastScreen screen = screenEnum.getScreen();
+			assertTrue("The screen is not initialized", screen.isInitialized());
+			assertNotNull("The screen has not asset manager", screen.getAssetManager());
+			assertEquals("The screens are not equals", screen, game.getScreen());
 		}
 	}
 
 	@Test
 	public void shouldDisposeProperlyAScreenOnChangingIt() {
-		MainScreen mainScreen = (MainScreen) ScreenEnumerator.MAIN.getScreen();
-		game.setScreen(mainScreen);
-		Assert.assertTrue("The screen is not initialized", mainScreen.isInitialized());
-		InfoScreen infoScreen = (InfoScreen) ScreenEnumerator.INFO.getScreen();
-		game.setScreen(infoScreen);
-		Assert.assertFalse("The screen is not disposed properly", mainScreen.isInitialized());
+		ProtoFastScreen mainScreen = ScreenEnumerator.MAIN.getScreen();
+		try {
+			game.setScreen(ScreenEnumerator.MAIN);
+		} catch (GdxRuntimeException e) {
+			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
+		}
+		assertTrue("The screen is not initialized", mainScreen.isInitialized());
+		try {
+			game.setScreen(ScreenEnumerator.INFO);
+		} catch (GdxRuntimeException e) {
+			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
+		}
+		assertFalse("The screen is not disposed properly", mainScreen.isInitialized());
 	}
 
 	@Test
 	public void shouldShowTheMainScreenAfterCreate() {
-		game.create();
-		Assert.assertEquals("The game is not showing the main screen", ScreenEnumerator.MAIN.getScreen(), game.getScreen());
+		try {
+			game.create();
+		} catch (GdxRuntimeException e) {
+			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
+		}
+		assertEquals("The game is not showing the main screen",
+				ScreenEnumerator.MAIN.getScreen(),
+				game.getScreen());
+	}
+
+	@Test
+	public void couldLoadTheCarModel() {
+		AssetManager assetManager = game.getAssetManager();
+		assetManager.load(CAR_MODEL, Model.class);
+		assetManager.finishLoading();
+		assertNotNull("Could not get car model: " + CAR_MODEL, assetManager.get(CAR_MODEL));
 	}
 
 	@After

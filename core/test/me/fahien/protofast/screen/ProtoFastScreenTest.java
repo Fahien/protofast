@@ -3,12 +3,14 @@ package me.fahien.protofast.screen;
 import com.badlogic.gdx.assets.AssetManager;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import me.fahien.protofast.GdxTestRunner;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 /**
  * {@link ProtoFastScreen} Test Case
@@ -27,7 +29,7 @@ public class ProtoFastScreenTest {
 
 	@Test
 	public void shouldNotBeInitialized() {
-		Assert.assertFalse("The screen is initialized", screen.isInitialized());
+		assertFalse("The screen is initialized", screen.isInitialized());
 	}
 
 	@Test
@@ -39,7 +41,7 @@ public class ProtoFastScreenTest {
 	@After
 	public void after() {
 		screen.dispose();
-		Assert.assertFalse("The screen is still initialized", screen.isInitialized());
-		Assert.assertNull("The asset manager is not null", screen.getAssetManager());
+		assertFalse("The screen is still initialized", screen.isInitialized());
+		assertNull("The asset manager is not null", screen.getAssetManager());
 	}
 }

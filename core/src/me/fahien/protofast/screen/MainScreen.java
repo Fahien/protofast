@@ -1,17 +1,16 @@
 package me.fahien.protofast.screen;
 
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 
 import me.fahien.protofast.camera.MainCamera;
 
@@ -21,21 +20,82 @@ import me.fahien.protofast.camera.MainCamera;
  * @author Fahien
  */
 public class MainScreen extends ProtoFastScreen {
+	protected static final String MODELS_DIR = "models/";
+	protected static final String CAR_MODEL = MODELS_DIR + "car.g3db";
 
 	private PerspectiveCamera camera;
 
-	// TODO remove temp variables
-	private Model model;
 	private ModelInstance instance;
 	private ModelBatch batch;
 	private Environment environment;
+
+	// TODO remove test variables
+	private CameraInputController cameraController;
 
 	public MainScreen() {
 		camera = new MainCamera();
 	}
 
+	/**
+	 * Returns the camera
+	 */
 	public PerspectiveCamera getCamera() {
 		return camera;
+	}
+
+	/**
+	 *
+	 * Returns the {@link ModelInstance}
+	 */
+	public ModelInstance getInstance() {
+		return instance;
+	}
+
+	/**
+	 * Returns the {@link ModelBatch}
+	 */
+	public ModelBatch getBatch() {
+		return batch;
+	}
+
+	/**
+	 * Returns the {@link Environment}
+	 */
+	public Environment getEnvironment() {
+		return environment;
+	}
+
+	/**
+	 * Loads the resources
+	 */
+	protected void loadResources() {
+		AssetManager assetManager = getAssetManager();
+		assetManager.load(CAR_MODEL, Model.class);
+		assetManager.finishLoading();
+	}
+
+	/**
+	 * Initializes the entities
+	 */
+	protected void initEntities() {
+		Model model = getAssetManager().get(CAR_MODEL);
+		instance = new ModelInstance(model);
+	}
+
+	/**
+	 * Initializes the {@link ModelBatch}
+	 */
+	protected void initBatch() {
+		batch = new ModelBatch();
+	}
+
+	/**
+	 * Initializes the {@link Environment}
+	 */
+	protected void initEnvironment() {
+		environment = new Environment();
+		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 	}
 
 	@Override
@@ -43,24 +103,28 @@ public class MainScreen extends ProtoFastScreen {
 		super.show();
 		camera.update();
 
-		// testInit();
+		loadResources();
+		initEntities();
+		initBatch();
+		initEnvironment();
+		testInit();
 	}
 
 	private void testInit() {
-		batch = new ModelBatch();
-		ModelBuilder modelBuilder = new ModelBuilder();
-		model = modelBuilder.createBox(5f, 5f, 5f,
-				new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-				VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		instance = new ModelInstance(model);
-		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		cameraController = new CameraInputController(camera);
+		Gdx.input.setInputProcessor(cameraController);
 	}
 
 	@Override
 	public void render(float delta) {
 		super.render(delta);
+
+		testRender();
+	}
+
+	// TODO remove test methods
+	private void testRender() {
+		cameraController.update();
 		batch.begin(camera);
 		batch.render(instance, environment);
 		batch.end();
@@ -69,11 +133,6 @@ public class MainScreen extends ProtoFastScreen {
 	@Override
 	public void dispose() {
 		super.dispose();
-		testDispose();
-	}
-
-	private void testDispose() {
 		if (batch != null) batch.dispose();
-		if (model != null) model.dispose();
 	}
 }
