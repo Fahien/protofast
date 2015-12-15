@@ -11,6 +11,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import me.fahien.protofast.GdxTestRunner;
+import me.fahien.protofast.screen.InfoScreen;
+import me.fahien.protofast.screen.MainScreen;
+import me.fahien.protofast.screen.ProtoFastScreen;
+import me.fahien.protofast.screen.ScreenEnumerator;
+
 /**
  * {@link ProtoFastGame} Test Case
  *
@@ -52,6 +58,26 @@ public class ProtoFastGameTest {
 		for(FileHandle file : files) {
 			Assert.assertNotNull("Could not get an asset: " + file.path(), assetManager.get(file.path(), Texture.class));
 		}
+	}
+
+	@Test
+	public void couldInjectDependenciesInScreens() {
+		for (ScreenEnumerator screenEnum : ScreenEnumerator.values()) {
+			ProtoFastScreen screen = screenEnum.getScreen();
+			game.setScreen(screen);
+			Assert.assertTrue(screen.isInitialized());
+			Assert.assertEquals("The screens are not equals", screen, game.getScreen());
+		}
+	}
+
+	@Test
+	public void shouldDisposeProperlyAScreenOnChangingIt() {
+		MainScreen mainScreen = (MainScreen) ScreenEnumerator.MAIN.getScreen();
+		game.setScreen(mainScreen);
+		Assert.assertTrue("The screen is not initialized", mainScreen.isInitialized());
+		InfoScreen infoScreen = (InfoScreen) ScreenEnumerator.INFO.getScreen();
+		game.setScreen(infoScreen);
+		Assert.assertFalse("The screen is not disposed properly", mainScreen.isInitialized());
 	}
 
 	@After

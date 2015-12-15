@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Logger;
 
+import me.fahien.protofast.screen.ProtoFastScreen;
+
 /**
  * Proto Fast {@link Game}
  *
@@ -30,10 +32,18 @@ public class ProtoFastGame extends Game {
 		return assetManager;
 	}
 
+	/**
+	 * Sets properly a {@link ProtoFastScreen}
+	 */
+	public void setScreen(ProtoFastScreen screen) {
+		super.setScreen(screen);
+		screen.setInitialized(true);
+	}
+
 	@Override
 	public void create() {
 		Gdx.app.setLogLevel(LOGGER_LEVEL);
-		logger.info("Game initialized");
+		logger.debug("Game initialized");
 	}
 
 	@Override
@@ -45,6 +55,6 @@ public class ProtoFastGame extends Game {
 	public void dispose() {
 		super.dispose();
 		assetManager.dispose();
-		logger.info("Game disposed");
+		logger.debug("Game disposed");
 	}
 }

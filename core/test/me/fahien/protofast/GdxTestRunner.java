@@ -1,4 +1,4 @@
-package me.fahien.protofast.game;
+package me.fahien.protofast;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
