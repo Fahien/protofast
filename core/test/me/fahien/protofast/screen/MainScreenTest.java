@@ -1,9 +1,11 @@
 package me.fahien.protofast.screen;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Fahien
  */
 public class MainScreenTest {
+	protected static final String MODEL = "track_cone_v0.4.010";
 
 	private MainScreen screen = (MainScreen) ScreenEnumerator.MAIN.getScreen();
 
@@ -41,14 +44,17 @@ public class MainScreenTest {
 	public void couldLoadResources() {
 		AssetManager assetManager = new AssetManager();
 		screen.setAssetManager(assetManager);
-		screen.loadResources();
-		assertNotNull("The car model is null", assetManager.get(MainScreen.CAR_MODEL));
+		screen.loadModel(MODEL);
+		while (assetManager.getProgress() < 1.0f) {
+			assetManager.update();
+		}
+		assertNotNull("The car model is null", assetManager.get(MainScreen.MODELS_DIR + MODEL + MainScreen.G3DB_EXT));
 	}
 
 	@Test
-	public void couldInitializeEntitiesAfterLoadResources() {
+	public void couldInitializeInstanceAfterLoadResources() {
 		couldLoadResources();
-		screen.initEntities();
+		screen.updateInstance(MODEL);
 		assertNotNull("The instance is null", screen.getInstance());
 	}
 
@@ -66,6 +72,14 @@ public class MainScreenTest {
 	public void couldInitializeTheEnvironment() {
 		screen.initEnvironment();
 		assertNotNull("The environment is null", screen.getEnvironment());
+	}
+
+	@Test
+	public void couldLoadTheListOfModels() {
+		screen.loadModelList();
+		Array<String> list = screen.getModelList();
+		Assert.assertNotNull("The model list is null", list);
+		Assert.assertNotEquals("The model list is empty", list.size);
 	}
 
 	@After

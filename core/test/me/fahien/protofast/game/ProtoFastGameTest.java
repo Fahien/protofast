@@ -32,7 +32,7 @@ public class ProtoFastGameTest {
 	private static final String TEST_DIR = "test/";
 	private static final String TEST_ASSET = TEST_DIR + "badlogic.jpg";
 	private static final String MODELS_DIR = "models/";
-	private static final String CAR_MODEL = MODELS_DIR + "car.g3db";
+	private static final String CAR_MODEL = MODELS_DIR + "racing_v0.4.003.g3db";
 
 	private ProtoFastGame game;
 

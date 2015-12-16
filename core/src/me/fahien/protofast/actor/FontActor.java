@@ -10,19 +10,32 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * @author Fahien
  */
 public class FontActor extends Actor {
+	public enum Halign {
+		LEFT(0),
+		RIGHT(-1),
+		CENTER(1);
+
+		private int value;
+
+		Halign(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+	}
 
 	private BitmapFont font;
 	private StringBuilder text;
 
-	private float marginX;
-	private float marginY;
+	private int halign;
 
 	public FontActor(BitmapFont font, String text) {
 		super();
 		this.font = font;
 		this.text = new StringBuilder(text);
-		marginX = font.getCapHeight() / 2;
-		marginY = font.getCapHeight();
+		halign = Halign.RIGHT.getValue();
 	}
 
 	/**
@@ -40,9 +53,16 @@ public class FontActor extends Actor {
 		this.text.delete(text.length(), this.text.length());
 	}
 
+	/**
+	 * Sets horizontal alignment
+	 */
+	public void setHalign(Halign halign) {
+		this.halign = halign.getValue();
+	}
+
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
-		font.draw(batch, text, getX() + marginX, getY() + marginY);
+		font.draw(batch, text, getX(), getY() + getHeight() / 2, getWidth(), halign, false);
 	}
 }
