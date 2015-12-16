@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /**
  * Proto Fast {@link Screen}
@@ -11,9 +12,12 @@ import com.badlogic.gdx.graphics.GL20;
  * @author Fahien
  */
 public class ProtoFastScreen implements Screen {
+	protected static final int WIDTH = 480;
+	protected static final int HEIGHT = 270;
 
 	private boolean initialized;
 	private AssetManager assetManager;
+	private BitmapFont font;
 
 	/**
 	 * Tests whether is initialized
@@ -43,6 +47,20 @@ public class ProtoFastScreen implements Screen {
 		this.assetManager = assetManager;
 	}
 
+	/**
+	 * Sets the {@link BitmapFont}
+	 */
+	public void setFont(BitmapFont font) {
+		this.font = font;
+	}
+
+	/**
+	 * Returns the {@link BitmapFont}
+	 */
+	public BitmapFont getFont() {
+		return font;
+	}
+
 	@Override
 	public void show() {}
 
@@ -68,6 +86,7 @@ public class ProtoFastScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		font = null;
 		assetManager = null;
 		initialized = false;
 	}

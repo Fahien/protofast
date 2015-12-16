@@ -20,13 +20,21 @@ public class MainScreenTest {
 	private MainScreen screen = (MainScreen) ScreenEnumerator.MAIN.getScreen();
 
 	@Before
-	public void before() {
-
-	}
+	public void before() {}
 
 	@Test
 	public void shouldHaveACamera() {
 		assertNotNull("The main screen has no camera", screen.getCamera());
+	}
+
+	@Test
+	public void couldInitializeTheStage() {
+		try {
+			screen.initStage();
+			assertNotNull("The main screen has no stage", screen.getStage());
+		} catch (IllegalArgumentException e) {
+			logger.error("Could not initialize the stage during tests: " + e.getMessage());
+		}
 	}
 
 	@Test
@@ -45,7 +53,7 @@ public class MainScreenTest {
 	}
 
 	@Test
-	public void couldInitializeTheModelBatch() {
+	public void couldInitializeTheBatch() {
 		try {
 			screen.initBatch();
 			assertNotNull(screen.getBatch());

@@ -42,7 +42,7 @@ public class ProtoFastGameTest {
 	}
 
 	@Test
-	public void coudlGetTheAssetManager() {
+	public void couldGetTheAssetManager() {
 		assertNotNull("The game has no asset manager", game.getAssetManager());
 	}
 
@@ -69,15 +69,17 @@ public class ProtoFastGameTest {
 
 	@Test
 	public void couldInjectDependenciesInScreens() {
+		game.loadFont();
 		for (ScreenEnumerator screenEnum : ScreenEnumerator.values()) {
 			try {
 				game.setScreen(screenEnum);
-			} catch (GdxRuntimeException e) {
+			} catch (GdxRuntimeException|IllegalArgumentException e) {
 				logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
 			}
 			ProtoFastScreen screen = screenEnum.getScreen();
 			assertTrue("The screen is not initialized", screen.isInitialized());
-			assertNotNull("The screen has not asset manager", screen.getAssetManager());
+			assertNotNull("The screen has no asset manager", screen.getAssetManager());
+			assertNotNull("The screen has no font", screen.getFont());
 			assertEquals("The screens are not equals", screen, game.getScreen());
 		}
 	}
@@ -87,13 +89,13 @@ public class ProtoFastGameTest {
 		ProtoFastScreen mainScreen = ScreenEnumerator.MAIN.getScreen();
 		try {
 			game.setScreen(ScreenEnumerator.MAIN);
-		} catch (GdxRuntimeException e) {
+		} catch (GdxRuntimeException|IllegalArgumentException e) {
 			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
 		}
 		assertTrue("The screen is not initialized", mainScreen.isInitialized());
 		try {
 			game.setScreen(ScreenEnumerator.INFO);
-		} catch (GdxRuntimeException e) {
+		} catch (GdxRuntimeException|IllegalArgumentException e) {
 			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
 		}
 		assertFalse("The screen is not disposed properly", mainScreen.isInitialized());
@@ -103,7 +105,7 @@ public class ProtoFastGameTest {
 	public void shouldShowTheMainScreenAfterCreate() {
 		try {
 			game.create();
-		} catch (GdxRuntimeException e) {
+		} catch (GdxRuntimeException|IllegalArgumentException e) {
 			logger.error("Could not initialize the Model Batch during tests: " + e.getMessage());
 		}
 		assertEquals("The game is not showing the main screen",
@@ -117,6 +119,12 @@ public class ProtoFastGameTest {
 		assetManager.load(CAR_MODEL, Model.class);
 		assetManager.finishLoading();
 		assertNotNull("Could not get car model: " + CAR_MODEL, assetManager.get(CAR_MODEL));
+	}
+
+	@Test
+	public void couldLoadAndGetTheFont() {
+		game.loadFont();
+		assertNotNull("Could not get the font", game.getFont());
 	}
 
 	@After

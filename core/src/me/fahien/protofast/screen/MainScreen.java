@@ -11,7 +11,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
+import me.fahien.protofast.actor.FontActor;
 import me.fahien.protofast.camera.MainCamera;
 
 /**
@@ -21,9 +26,14 @@ import me.fahien.protofast.camera.MainCamera;
  */
 public class MainScreen extends ProtoFastScreen {
 	protected static final String MODELS_DIR = "models/";
-	protected static final String CAR_MODEL = MODELS_DIR + "car.g3db";
+	protected static final String CAR_MODEL = MODELS_DIR + "racing_v0.4.003.g3db";
+	private static final String FPS_TXT = "FPS: ";
 
 	private PerspectiveCamera camera;
+
+	private Stage stage;
+	private FontActor fpsActor;
+	private Viewport viewport;
 
 	private ModelInstance instance;
 	private ModelBatch batch;
@@ -34,6 +44,7 @@ public class MainScreen extends ProtoFastScreen {
 
 	public MainScreen() {
 		camera = new MainCamera();
+		viewport = new FitViewport(WIDTH, HEIGHT);
 	}
 
 	/**
@@ -41,6 +52,13 @@ public class MainScreen extends ProtoFastScreen {
 	 */
 	public PerspectiveCamera getCamera() {
 		return camera;
+	}
+
+	/**
+	 * Returns the stage
+	 */
+	public Stage getStage() {
+		return stage;
 	}
 
 	/**
@@ -90,6 +108,22 @@ public class MainScreen extends ProtoFastScreen {
 	}
 
 	/**
+	 * Initializes the {@link Stage}
+	 */
+	protected void initStage() {
+		stage = new Stage();
+		stage.setViewport(viewport);
+	}
+
+	/**
+	 * Initializes the {@link Actor}s
+	 */
+	protected void initActors() {
+		fpsActor = new FontActor(getFont(), FPS_TXT + Gdx.graphics.getFramesPerSecond());
+		stage.addActor(fpsActor);
+	}
+
+	/**
 	 * Initializes the {@link Environment}
 	 */
 	protected void initEnvironment() {
@@ -103,6 +137,8 @@ public class MainScreen extends ProtoFastScreen {
 		super.show();
 		camera.update();
 
+		initStage();
+		initActors();
 		loadResources();
 		initEntities();
 		initBatch();
@@ -120,6 +156,7 @@ public class MainScreen extends ProtoFastScreen {
 		super.render(delta);
 
 		testRender();
+		test2DRender(delta);
 	}
 
 	// TODO remove test methods
@@ -130,9 +167,23 @@ public class MainScreen extends ProtoFastScreen {
 		batch.end();
 	}
 
+	private void test2DRender(float delta) {
+		fpsActor.setText(FPS_TXT + Gdx.graphics.getFramesPerSecond());
+		viewport.apply();
+		stage.act(delta);
+		stage.draw();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		super.resize(width, height);
+		viewport.update(width, height, true);
+	}
+
 	@Override
 	public void dispose() {
 		super.dispose();
 		if (batch != null) batch.dispose();
+		if (stage != null) stage.dispose();
 	}
 }

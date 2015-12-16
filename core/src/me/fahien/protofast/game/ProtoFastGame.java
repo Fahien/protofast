@@ -3,6 +3,7 @@ package me.fahien.protofast.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Logger;
 
 import me.fahien.protofast.screen.ProtoFastScreen;
@@ -20,10 +21,13 @@ public class ProtoFastGame extends Game {
 			"╩  ┴└─└─┘ ┴ └─┘╚  ┴ ┴└─┘ ┴ ";
 
 	private static final int LOGGER_LEVEL = Logger.DEBUG;
+	private static final String SYSTEM_PATH = "system/";
+	private static final String SYSTEM_FONT = SYSTEM_PATH + "font.fnt";
 
 	public static final Logger logger = new Logger(ProtoFastGame.class.getSimpleName(), LOGGER_LEVEL);
 
 	private AssetManager assetManager;
+	private BitmapFont font;
 
 	public ProtoFastGame() {
 		assetManager = new AssetManager();
@@ -37,11 +41,25 @@ public class ProtoFastGame extends Game {
 	}
 
 	/**
+	 * Returns the {@link BitmapFont}
+	 */
+	public BitmapFont getFont() {
+		return font;
+	}
+
+	protected void loadFont() {
+		assetManager.load(SYSTEM_FONT, BitmapFont.class);
+		assetManager.finishLoading();
+		font = assetManager.get(SYSTEM_FONT);
+	}
+
+	/**
 	 * Sets the screen using {@link ScreenEnumerator}
 	 */
 	public void setScreen(ScreenEnumerator screenEnumerator) {
 		ProtoFastScreen screen = screenEnumerator.getScreen();
 		screen.setAssetManager(assetManager);
+		screen.setFont(font);
 		screen.setInitialized(true);
 		setScreen(screen);
 	}
@@ -50,6 +68,7 @@ public class ProtoFastGame extends Game {
 	public void create() {
 		Gdx.app.setLogLevel(LOGGER_LEVEL);
 		logger.info(logo);
+		loadFont();
 		setScreen(ScreenEnumerator.MAIN);
 		logger.debug("Game initialized");
 	}
