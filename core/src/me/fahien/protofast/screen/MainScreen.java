@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,6 +26,8 @@ import me.fahien.protofast.actor.FontActor;
 import me.fahien.protofast.camera.MainCamera;
 import me.fahien.protofast.game.ProtoFastGame;
 
+import static me.fahien.protofast.game.ProtoFastGame.logger;
+
 /**
  * The Main {@link ProtoFastScreen}
  *
@@ -33,6 +36,7 @@ import me.fahien.protofast.game.ProtoFastGame;
 public class MainScreen extends ProtoFastScreen {
 	private static final boolean DEBUG_ALL = false;
 	protected static final String MODELS_DIR = "models/";
+	protected static final String MODEL_LIST = MODELS_DIR + "list.txt";
 	protected static final String G3DB_EXT = ".g3db";
 	private static final String TITLE_TXT = "Unknown";
 	private static final String FPS_TXT = "FPS: ";
@@ -69,14 +73,18 @@ public class MainScreen extends ProtoFastScreen {
 	/**
 	 * Loads the model list
 	 */
-	public void loadModelList() {
-		FileHandle[] files = Gdx.files.internal(MODELS_DIR).list();
-		modelList = new Array<>(files.length);
-		for(FileHandle file : files) {
-			String path = file.path();
-			if (path.endsWith(G3DB_EXT)) {
-				modelList.add(file.nameWithoutExtension());
+	protected void loadModelList() {
+		FileHandle file = Gdx.files.internal(MODEL_LIST);
+		String listString = file.readString();
+		String[] modelNames = listString.split("\n");
+		if (modelNames.length > 0) {
+			logger.info(modelNames.length + " models found in directory: " + MODELS_DIR);
+			modelList = new Array<>(modelNames.length);
+			for (int i = 0; i < modelNames.length; i++) {
+				modelList.add(modelNames[i]);
 			}
+		} else {
+			logger.error("Models not found in directory: " + MODELS_DIR);
 		}
 	}
 
@@ -90,14 +98,14 @@ public class MainScreen extends ProtoFastScreen {
 	/**
 	 * Returns the camera
 	 */
-	public PerspectiveCamera getCamera() {
+	protected PerspectiveCamera getCamera() {
 		return camera;
 	}
 
 	/**
 	 * Returns the stage
 	 */
-	public Stage getStage() {
+	protected Stage getStage() {
 		return stage;
 	}
 
@@ -105,21 +113,21 @@ public class MainScreen extends ProtoFastScreen {
 	 *
 	 * Returns the {@link ModelInstance}
 	 */
-	public ModelInstance getInstance() {
+	protected ModelInstance getInstance() {
 		return instance;
 	}
 
 	/**
 	 * Returns the {@link ModelBatch}
 	 */
-	public ModelBatch getBatch() {
+	protected ModelBatch getBatch() {
 		return batch;
 	}
 
 	/**
 	 * Returns the {@link Environment}
 	 */
-	public Environment getEnvironment() {
+	protected Environment getEnvironment() {
 		return environment;
 	}
 
@@ -214,23 +222,27 @@ public class MainScreen extends ProtoFastScreen {
 	 * Loads previous {@link Model}
 	 */
 	private void loadPreviousModel() {
-		ProtoFastGame.logger.info("Loading previous model");
-		instance = null;
-		getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
-		modelIndex = (--modelIndex < 0) ? modelList.size - 1 : modelIndex;
-		loadModel(modelList.get(modelIndex));
+		logger.info("Loading previous model");
+		if (modelList != null) {
+			instance = null;
+			getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+			modelIndex = (--modelIndex < 0) ? modelList.size - 1 : modelIndex;
+			loadModel(modelList.get(modelIndex));
+		}
 	}
 
 	/**
 	 * Loads next {@link Model}
 	 */
 	private void loadNextModel() {
-		ProtoFastGame.logger.info("Loading next model");
-		titleActor.setText(TITLE_TXT);
-		instance = null;
-		getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
-		modelIndex = (++modelIndex >= modelList.size) ? 0 : modelIndex;
-		loadModel(modelList.get(modelIndex));
+		logger.info("Loading next model");
+		if (modelList != null) {
+			titleActor.setText(TITLE_TXT);
+			instance = null;
+			getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+			modelIndex = (++modelIndex >= modelList.size) ? 0 : modelIndex;
+			loadModel(modelList.get(modelIndex));
+		}
 	}
 
 	/**
@@ -262,8 +274,10 @@ public class MainScreen extends ProtoFastScreen {
 		initActors();
 
 		loadModelList();
+
 		loadModel(modelList.get(modelIndex));
 		updateInstance(modelList.get(modelIndex));
+
 		initBatch();
 		initEnvironment();
 		initController();
@@ -272,7 +286,7 @@ public class MainScreen extends ProtoFastScreen {
 	@Override
 	public void render(float delta) {
 		super.render(delta);
-		updateInstance(modelList.get(modelIndex));
+		if (modelList != null) updateInstance(modelList.get(modelIndex));
 		testRender();
 		test2DRender(delta);
 	}

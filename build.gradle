@@ -13,7 +13,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = '1.0.1'
     ext {
         appName = "protofast"
         gdxVersion = '1.7.1'
@@ -39,9 +39,6 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
     }
 }
 
@@ -85,9 +82,6 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        compile "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.mockito:mockito-all:$mockitoVersion"

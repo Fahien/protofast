@@ -1,6 +1,8 @@
 package me.fahien.protofast.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
@@ -74,8 +76,21 @@ public class MainScreenTest {
 		assertNotNull("The environment is null", screen.getEnvironment());
 	}
 
+	private void createTheModelList() {
+		String modelList = "";
+		FileHandle[] files = Gdx.files.local(MainScreen.MODELS_DIR).list();
+		for (FileHandle file : files) {
+			if (file.path().endsWith(MainScreen.G3DB_EXT)) {
+				modelList += file.nameWithoutExtension() + "\n";
+			}
+		}
+		FileHandle fileList = Gdx.files.local(MainScreen.MODEL_LIST);
+		fileList.writeString(modelList, false);
+	}
+
 	@Test
 	public void couldLoadTheListOfModels() {
+		createTheModelList();
 		screen.loadModelList();
 		Array<String> list = screen.getModelList();
 		Assert.assertNotNull("The model list is null", list);
