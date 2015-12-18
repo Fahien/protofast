@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import static me.fahien.protofast.GdxTestRunner.logger;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * The {@link MainScreen} Test Case
@@ -91,10 +92,44 @@ public class MainScreenTest {
 	@Test
 	public void couldLoadTheListOfModels() {
 		createTheModelList();
-		screen.loadModelList();
+		screen.loadInternalModels();
 		Array<String> list = screen.getModelList();
 		Assert.assertNotNull("The model list is null", list);
 		Assert.assertNotEquals("The model list is empty", list.size);
+	}
+
+	@Test
+	public void couldLoadNextModel() {
+		AssetManager assetManager = new AssetManager();
+		screen.setAssetManager(assetManager);
+		screen.loadNextModel();
+		assertNull("The instance is not null", screen.getInstance());
+		screen.loadInternalModels();
+		screen.loadNextModel();
+		assetManager.finishLoading();
+		screen.updateInstanceWithCurrentModel();
+		assertNotNull("The instance is null", screen.getInstance());
+	}
+
+	@Test
+	public void couldLoadPreviousModel() {
+		AssetManager assetManager = new AssetManager();
+		screen.setAssetManager(assetManager);
+		screen.loadPreviousModel();
+		assertNull("The instance is not null", screen.getInstance());
+		screen.loadInternalModels();
+		screen.loadPreviousModel();
+		assetManager.finishLoading();
+		screen.updateInstanceWithCurrentModel();
+		assertNotNull("The instance is null", screen.getInstance());
+	}
+
+	@Test
+	public void couldLoadLocalModels() {
+		AssetManager assetManager = new AssetManager();
+		screen.setAssetManager(assetManager);
+		screen.loadLocalModels();
+		assertNotNull(screen.getModelList());
 	}
 
 	@After

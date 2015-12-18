@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,7 +23,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import me.fahien.protofast.actor.FontActor;
 import me.fahien.protofast.camera.MainCamera;
-import me.fahien.protofast.game.ProtoFastGame;
 
 import static me.fahien.protofast.game.ProtoFastGame.logger;
 
@@ -62,7 +60,6 @@ public class MainScreen extends ProtoFastScreen {
 	private ModelBatch batch;
 	private Environment environment;
 
-	// TODO remove test variables
 	private CameraInputController cameraController;
 
 	public MainScreen() {
@@ -71,20 +68,50 @@ public class MainScreen extends ProtoFastScreen {
 	}
 
 	/**
-	 * Loads the model list
+	 * Loads the models
 	 */
 	protected void loadModelList() {
+		loadLocalModels();
+		if (modelList == null) {
+			logger.error("No models found in the local directory: " + MODELS_DIR);
+			loadInternalModels();
+		}
+	}
+
+	/**
+	 * Loads the model list
+	 */
+	protected void loadInternalModels() {
 		FileHandle file = Gdx.files.internal(MODEL_LIST);
 		String listString = file.readString();
 		String[] modelNames = listString.split("\n");
 		if (modelNames.length > 0) {
-			logger.info(modelNames.length + " models found in directory: " + MODELS_DIR);
+			logger.info(modelNames.length + " models found in the internal directory: " + MODELS_DIR);
 			modelList = new Array<>(modelNames.length);
-			for (int i = 0; i < modelNames.length; i++) {
-				modelList.add(modelNames[i]);
+			for (String modelName : modelNames) {
+				modelList.add(modelName);
 			}
 		} else {
 			logger.error("Models not found in directory: " + MODELS_DIR);
+		}
+	}
+
+	/**
+	 * Loads the local models
+	 */
+	public void loadLocalModels() {
+		FileHandle modelDir = Gdx.files.local(MODELS_DIR);
+		if (modelDir.isDirectory()) {
+			FileHandle[] files = modelDir.list();
+			if (files.length > 0) {
+				modelList = new Array<>(files.length);
+				for (FileHandle file : files) {
+					if (file.name().endsWith(G3DB_EXT)) {
+						modelList.add(file.nameWithoutExtension());
+					}
+				}
+				logger.info(modelList.size + " models found in the local directory: " + MODELS_DIR);
+			}
 		}
 	}
 
@@ -132,6 +159,13 @@ public class MainScreen extends ProtoFastScreen {
 	}
 
 	/**
+	 * Loads the current model
+	 */
+	protected void loadCurrentModel() {
+		if (modelList != null) loadModel(modelList.get(modelIndex));
+	}
+
+	/**
 	 * Loads the resources
 	 */
 	protected void loadModel(String modelName) {
@@ -140,7 +174,14 @@ public class MainScreen extends ProtoFastScreen {
 	}
 
 	/**
-	 * Initializes the entities
+	 * Update the instance with the current Model
+	 */
+	public void updateInstanceWithCurrentModel() {
+		if (modelList != null) updateInstance(modelList.get(modelIndex));
+	}
+
+	/**
+	 * Updates the instance with a model
 	 */
 	protected void updateInstance(String modelName) {
 		if (instance == null) {
@@ -221,27 +262,34 @@ public class MainScreen extends ProtoFastScreen {
 	/**
 	 * Loads previous {@link Model}
 	 */
-	private void loadPreviousModel() {
-		logger.info("Loading previous model");
+	protected void loadPreviousModel() {
 		if (modelList != null) {
-			instance = null;
-			getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+			logger.info("Loading previous model");
+			if (instance != null) {
+				getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+				instance = null;
+			}
 			modelIndex = (--modelIndex < 0) ? modelList.size - 1 : modelIndex;
 			loadModel(modelList.get(modelIndex));
+		} else {
+			logger.error("No models to load");
 		}
 	}
 
 	/**
 	 * Loads next {@link Model}
 	 */
-	private void loadNextModel() {
-		logger.info("Loading next model");
+	protected void loadNextModel() {
 		if (modelList != null) {
-			titleActor.setText(TITLE_TXT);
-			instance = null;
-			getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+			logger.info("Loading next model");
+			if (instance != null) {
+				getAssetManager().unload(MODELS_DIR + modelList.get(modelIndex) + G3DB_EXT);
+				instance = null;
+			}
 			modelIndex = (++modelIndex >= modelList.size) ? 0 : modelIndex;
 			loadModel(modelList.get(modelIndex));
+		} else {
+			logger.error("No models to load");
 		}
 	}
 
@@ -274,9 +322,8 @@ public class MainScreen extends ProtoFastScreen {
 		initActors();
 
 		loadModelList();
-
-		loadModel(modelList.get(modelIndex));
-		updateInstance(modelList.get(modelIndex));
+		loadCurrentModel();
+		updateInstanceWithCurrentModel();
 
 		initBatch();
 		initEnvironment();
@@ -286,20 +333,25 @@ public class MainScreen extends ProtoFastScreen {
 	@Override
 	public void render(float delta) {
 		super.render(delta);
-		if (modelList != null) updateInstance(modelList.get(modelIndex));
-		testRender();
-		test2DRender(delta);
+		updateInstanceWithCurrentModel();
+		cameraController.update();
+		render3D();
+		render2D(delta);
 	}
 
-	// TODO remove test methods
-	private void testRender() {
-		cameraController.update();
+	/**
+	 * Render the 3D instance
+	 */
+	private void render3D() {
 		batch.begin(camera);
 		if (instance != null) batch.render(instance, environment);
 		batch.end();
 	}
 
-	private void test2DRender(float delta) {
+	/**
+	 * Render the 2D world
+	 */
+	private void render2D(float delta) {
 		fpsActor.setText(FPS_TXT + Gdx.graphics.getFramesPerSecond());
 		viewport.apply();
 		stage.act(delta);
@@ -315,6 +367,7 @@ public class MainScreen extends ProtoFastScreen {
 	@Override
 	public void dispose() {
 		super.dispose();
+		if (instance != null) instance = null;
 		if (batch != null) batch.dispose();
 		if (stage != null) stage.dispose();
 	}
