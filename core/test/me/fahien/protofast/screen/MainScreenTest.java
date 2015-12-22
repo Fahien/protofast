@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNull;
  * @author Fahien
  */
 public class MainScreenTest {
-	protected static final String MODEL = "track_cone_v0.4.010";
+	protected static final String MODEL = "player";
 
 	private MainScreen screen = (MainScreen) ScreenEnumerator.MAIN.getScreen();
 

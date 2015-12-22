@@ -32,7 +32,7 @@ public class ProtoFastGameTest {
 	private static final String TEST_DIR = "test/";
 	private static final String TEST_ASSET = TEST_DIR + "badlogic.jpg";
 	private static final String MODELS_DIR = "models/";
-	private static final String CAR_MODEL = MODELS_DIR + "racing_v0.4.003.g3db";
+	private static final String PLAYER_MODEL = MODELS_DIR + "player.g3db";
 
 	private ProtoFastGame game;
 
@@ -116,9 +116,9 @@ public class ProtoFastGameTest {
 	@Test
 	public void couldLoadTheCarModel() {
 		AssetManager assetManager = game.getAssetManager();
-		assetManager.load(CAR_MODEL, Model.class);
+		assetManager.load(PLAYER_MODEL, Model.class);
 		assetManager.finishLoading();
-		assertNotNull("Could not get car model: " + CAR_MODEL, assetManager.get(CAR_MODEL));
+		assertNotNull("Could not get car model: " + PLAYER_MODEL, assetManager.get(PLAYER_MODEL));
 	}
 
 	@Test

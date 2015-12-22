@@ -307,6 +307,7 @@ public class MainScreen extends ProtoFastScreen {
 	 */
 	private void initController() {
 		cameraController = new CameraInputController(camera);
+		cameraController.scrollFactor = -4;
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(cameraController);

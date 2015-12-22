@@ -1,3 +1,7 @@
-racing_v0.4.003
-track_cone_v0.4.010
-track_guardrail_v0.4.012
+asteroid
+mine
+player
+ufo
+earth
+bomb
+missile
