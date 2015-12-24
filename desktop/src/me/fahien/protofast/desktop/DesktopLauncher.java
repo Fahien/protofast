@@ -6,8 +6,8 @@ import me.fahien.protofast.game.ProtoFastGame;
 
 public class DesktopLauncher {
 	private static final String WINDOW_TITLE = "ProtoFast";
-	private static final int WINDOW_WIDTH = 960;
-	private static final int WINDOW_HEIGHT = 540;
+	private static final int WINDOW_WIDTH = 480;
+	private static final int WINDOW_HEIGHT = 270;
 
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
